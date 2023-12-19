@@ -123,7 +123,7 @@ window.onload = () => {
 	const select_ou_gyoku = ( w, h ) => {//#ou
 		for( let y = 0;y < MAX_LENGTH;y ++ ){
 			for( let x = 0;x < MAX_LENGTH;x ++ ){
-				v_field[ y ][ x ] = get_player_field( turn )[ y ][ x ];
+				v_field[ y ][ x ] = get_player_field( turn )[ y ][ x ];//仮想盤を更新(ターンのプレイヤーの盤面にする)
 			}
 		}
 		g.fillStyle = '#e3edf7';
@@ -132,7 +132,9 @@ window.onload = () => {
 			for( let x = ( turn ? w : MAX_LENGTH - w - 1 ) - 1;x < ( turn ? w : MAX_LENGTH - w - 1 ) + 2;x ++ ){
 				if( !( x >= 0 && x <= 8 ) ) continue;
 				if( v_field[ y ][ x ] != 0 ) continue;
+				//駒を置ける候補を追加
 				cand_position.push( [ turn ? x : MAX_LENGTH - x - 1, turn ? y : MAX_LENGTH - y - 1 ] );
+				//駒を置ける候補を描画( 水色のやつ )
 				g.fillRect( ( turn ? x : MAX_LENGTH - x - 1 ) * BLOCK_SIZE, ( turn ? y : MAX_LENGTH - y - 1 ) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
 			}
 		}
@@ -185,7 +187,7 @@ window.onload = () => {
 		}
 		if( !( nh - 2 >= 0 ) ) return;
 		g.fillStyle = '#e3edf7';
-		if( v_field[ nh - 2 ][ nw - 1 ] == 0 ){//こっちが違う
+		if( v_field[ nh - 2 ][ nw - 1 ] == 0 ){
 			cand_position.push( [ turn ? nw - 1 : ( MAX_LENGTH - ( nw - 1 ) - 1 ), turn ? nh - 2 : ( MAX_LENGTH - ( nh - 2 ) - 1 ) ] );
 			g.fillRect( ( turn ? nw - 1 : MAX_LENGTH - ( nw - 1 ) - 1 ) * BLOCK_SIZE, ( turn ? nh - 2 : MAX_LENGTH - ( nh - 2 ) - 1 ) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
 		}
@@ -348,8 +350,8 @@ window.onload = () => {
 		}
 	}
 	can.onclick = ( e ) => {
-		let click_x = 0;
-		let click_y = 0;
+		let click_x = 0;//x座標
+		let click_y = 0;//y座標
 		let move_flg = false;
 
 		for( let y = 0;y < MAX_LENGTH;y ++ ){
@@ -363,9 +365,9 @@ window.onload = () => {
 			}
 		}
 
-		g.clearRect( 0, 0, BLOCK_SIZE * MAX_LENGTH, BLOCK_SIZE * MAX_LENGTH );
+		g.clearRect( 0, 0, BLOCK_SIZE * MAX_LENGTH, BLOCK_SIZE * MAX_LENGTH );//画面のクリア
 		for( i = 0;i < cand_position.length;i ++ ){
-			if( cand_position[ i ][ 0 ] == click_x && cand_position[ i ][ 1 ] == click_y ){
+			if( cand_position[ i ][ 0 ] == click_x && cand_position[ i ][ 1 ] == click_y ){//候補から座標が一致した場所に駒を置く
 				move( ms_position, [ click_x, click_y ] );
 				move_flg = true;
 				cand_position = [];
@@ -374,8 +376,10 @@ window.onload = () => {
 			}
 		}
 		if( !move_flg ) select( get_player_field( turn )[ turn ? click_y : MAX_LENGTH - click_y - 1 ][ turn ? click_x : MAX_LENGTH - click_x - 1 ], click_x, click_y );//ターン処理に変える
+		//描画
 		draw_koma();
 		draw_field();
+		//magentaの描画( 選択時の色 )
 		g.strokeStyle = '#FF00FF';
 		g.strokeRect( click_x * BLOCK_SIZE, click_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
 	}
