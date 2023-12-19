@@ -4,6 +4,10 @@
 	3:金将
 	4:銀将
 */
+/*
+	敵との駒の衝突判定がまだ
+	プレイヤー2の飛車、角行との当たり判定がまだ
+*/
 
 window.onload = () => {
 	const can = document.getElementById( 'can' );
@@ -181,9 +185,9 @@ window.onload = () => {
 		}
 		if( !( nh - 2 >= 0 ) ) return;
 		g.fillStyle = '#e3edf7';
-		if( v_field[ nh - 2 ][ nw - 1 ] == 0 ){
+		if( v_field[ nh - 2 ][ nw - 1 ] == 0 ){//こっちが違う
 			cand_position.push( [ turn ? nw - 1 : ( MAX_LENGTH - ( nw - 1 ) - 1 ), turn ? nh - 2 : ( MAX_LENGTH - ( nh - 2 ) - 1 ) ] );
-			g.fillRect( turn ? nw : ( MAX_LENGTH - ( nw - 1 ) - 1 ) * BLOCK_SIZE, turn ? nh : ( MAX_LENGTH - ( nh - 2 ) - 1 ) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
+			g.fillRect( ( turn ? nw - 1 : MAX_LENGTH - ( nw - 1 ) - 1 ) * BLOCK_SIZE, ( turn ? nh - 2 : MAX_LENGTH - ( nh - 2 ) - 1 ) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
 		}
 		if( v_field[ nh - 2 ][ nw + 1 ] == 0 ){
 			cand_position.push( [ ( turn ? nw + 1 : MAX_LENGTH - ( nw + 1 ) - 1 ), ( turn ? nh - 2 : MAX_LENGTH - ( nh - 2 ) - 1 ) ] );
@@ -191,16 +195,18 @@ window.onload = () => {
 		}
 	}
 	const select_kou = ( w, h ) => {
+		let nw = ( turn ? w : MAX_LENGTH - w - 1 );
+		let nh = ( turn ? h : MAX_LENGTH - h - 1 );
 		for( let y = 0;y < MAX_LENGTH;y ++ ){ 
 			for( let x = 0;x < MAX_LENGTH;x ++ ){
-				v_field[ y ][ x ] = field[ y ][ x ];
+				v_field[ y ][ x ] = get_player_field( turn )[ y ][ x ];
 			}
 		}
 		g.fillStyle = '#e3edf7';
-		for( let y = h - 1;y >= 0;y -- ){
-			if( field[ y ][ w ] != 0 ) break;
-			cand_position.push( [ w, y ] );
-			g.fillRect( w * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
+		for( let y = nh - 1;y >= 0;y -- ){
+			if( v_field[ y ][ nw ] != 0 ) break;
+			cand_position.push( [ turn ? nw : MAX_LENGTH - nw - 1, turn ? y : MAX_LENGTH - y - 1 ] );
+			g.fillRect( ( turn ? nw : MAX_LENGTH - nw - 1 ) * BLOCK_SIZE, ( turn ? y : MAX_LENGTH - y - 1 ) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE );
 		}
 	}
 	const select_hohe = ( w, h ) => {//#hohe
@@ -326,7 +332,7 @@ window.onload = () => {
 		}
 		ms_position = [ w, h ];
 	}
-	const move = ( bf, af ) => {
+	const move = ( bf, af ) => {//駒を取った時の処理
 		if( turn ){//参考演算子使いましょう
 			get_player_field( turn )[ af[ 1 ] ][ af[ 0 ] ] = get_player_field( turn )[ bf[ 1 ] ][ bf[ 0 ] ];
 			get_player_field( turn )[ bf[ 1 ] ][ bf[ 0 ] ] = 0;
@@ -376,5 +382,5 @@ window.onload = () => {
 	//ここから処理開始
 	draw_field();
 	draw_koma();
-	turn = false;
+	turn = true;//true = myturn, false = partner
 }
